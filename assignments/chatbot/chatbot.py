@@ -1,7 +1,7 @@
 """ A neural chatbot using sequence to sequence model with
-attentional decoder. 
+attentional decoder.
 
-This is based on Google Translate Tensorflow model 
+This is based on Google Translate Tensorflow model
 https://github.com/tensorflow/models/blob/master/tutorials/rnn/translate/
 
 Sequence to sequence model by Cho et al.(2014)
@@ -33,7 +33,7 @@ import data
 def _get_random_bucket(train_buckets_scale):
     """ Get a random bucket from which to choose a training sample """
     rand = random.random()
-    return min([i for i in xrange(len(train_buckets_scale))
+    return min([i for i in range(len(train_buckets_scale))
                 if train_buckets_scale[i] > rand])
 
 def _assert_lengths(encoder_size, decoder_size, encoder_inputs, decoder_inputs, decoder_masks):
@@ -59,9 +59,9 @@ def run_step(sess, model, encoder_inputs, decoder_inputs, decoder_masks, bucket_
 
     # input feed: encoder inputs, decoder inputs, target_weights, as provided.
     input_feed = {}
-    for step in xrange(encoder_size):
+    for step in range(encoder_size):
         input_feed[model.encoder_inputs[step].name] = encoder_inputs[step]
-    for step in xrange(decoder_size):
+    for step in range(decoder_size):
         input_feed[model.decoder_inputs[step].name] = decoder_inputs[step]
         input_feed[model.decoder_masks[step].name] = decoder_masks[step]
 
@@ -75,7 +75,7 @@ def run_step(sess, model, encoder_inputs, decoder_inputs, decoder_masks, bucket_
                        model.losses[bucket_id]]  # loss for this batch.
     else:
         output_feed = [model.losses[bucket_id]]  # loss for this batch.
-        for step in xrange(decoder_size):  # output logits.
+        for step in range(decoder_size):  # output logits.
             output_feed.append(model.outputs[bucket_id][step])
 
     outputs = sess.run(output_feed, input_feed)
@@ -86,17 +86,17 @@ def run_step(sess, model, encoder_inputs, decoder_inputs, decoder_masks, bucket_
 
 def _get_buckets():
     """ Load the dataset into buckets based on their lengths.
-    train_buckets_scale is the inverval that'll help us 
+    train_buckets_scale is the inverval that'll help us
     choose a random bucket later on.
     """
     test_buckets = data.load_data('test_ids.enc', 'test_ids.dec')
     data_buckets = data.load_data('train_ids.enc', 'train_ids.dec')
-    train_bucket_sizes = [len(data_buckets[b]) for b in xrange(len(config.BUCKETS))]
+    train_bucket_sizes = [len(data_buckets[b]) for b in range(len(config.BUCKETS))]
     print("Number of samples in each bucket:\n", train_bucket_sizes)
     train_total_size = sum(train_bucket_sizes)
     # list of increasing numbers from 0 to 1 that we'll use to select a bucket.
     train_buckets_scale = [sum(train_bucket_sizes[:i + 1]) / train_total_size
-                           for i in xrange(len(train_bucket_sizes))]
+                           for i in range(len(train_bucket_sizes))]
     print("Bucket scale:\n", train_buckets_scale)
     return test_buckets, data_buckets, train_buckets_scale
 
@@ -117,15 +117,15 @@ def _check_restore_parameters(sess, saver):
 
 def _eval_test_set(sess, model, test_buckets):
     """ Evaluate on the test set. """
-    for bucket_id in xrange(len(config.BUCKETS)):
+    for bucket_id in range(len(config.BUCKETS)):
         if len(test_buckets[bucket_id]) == 0:
             print("  Test: empty bucket %d" % (bucket_id))
             continue
         start = time.time()
-        encoder_inputs, decoder_inputs, decoder_masks = data.get_batch(test_buckets[bucket_id], 
+        encoder_inputs, decoder_inputs, decoder_masks = data.get_batch(test_buckets[bucket_id],
                                                                         bucket_id,
                                                                         batch_size=config.BATCH_SIZE)
-        _, step_loss, _ = run_step(sess, model, encoder_inputs, decoder_inputs, 
+        _, step_loss, _ = run_step(sess, model, encoder_inputs, decoder_inputs,
                                    decoder_masks, bucket_id, True)
         print('Test bucket {}: loss {}, time {}'.format(bucket_id, step_loss, time.time() - start))
 
@@ -148,7 +148,7 @@ def train():
         while True:
             skip_step = _get_skip_step(iteration)
             bucket_id = _get_random_bucket(train_buckets_scale)
-            encoder_inputs, decoder_inputs, decoder_masks = data.get_batch(data_buckets[bucket_id], 
+            encoder_inputs, decoder_inputs, decoder_masks = data.get_batch(data_buckets[bucket_id],
                                                                            bucket_id,
                                                                            batch_size=config.BATCH_SIZE)
             start = time.time()
@@ -175,14 +175,14 @@ def _get_user_input():
 
 def _find_right_bucket(length):
     """ Find the proper bucket for an encoder input based on its length """
-    return min([b for b in xrange(len(config.BUCKETS))
+    return min([b for b in range(len(config.BUCKETS))
                 if config.BUCKETS[b][0] >= length])
 
 def _construct_response(output_logits, inv_dec_vocab):
     """ Construct a response to the user's encoder input.
     @output_logits: the outputs from sequence to sequence wrapper.
     output_logits is decoder_size np array, each of dim 1 x DEC_VOCAB
-    
+
     This is a greedy decoder - outputs are just argmaxes of output_logits.
     """
     print(output_logits[0])
@@ -227,7 +227,7 @@ def chat():
             # Which bucket does it belong to?
             bucket_id = _find_right_bucket(len(token_ids))
             # Get a 1-element batch to feed the sentence to the model.
-            encoder_inputs, decoder_inputs, decoder_masks = data.get_batch([(token_ids, [])], 
+            encoder_inputs, decoder_inputs, decoder_masks = data.get_batch([(token_ids, [])],
                                                                             bucket_id,
                                                                             batch_size=1)
             # Get output logits for the sentence.

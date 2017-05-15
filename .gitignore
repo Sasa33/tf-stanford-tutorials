@@ -1,4 +1,4 @@
-
+.DS_Store
 *.pdf
 
 *.SUNet
@@ -12,3 +12,6 @@ examples/chatbot/checkpoints/*
 examples/chatbot/data_analysis.py
 
 assignments/chatbot/processed/*
+assignments/chatbot/processed.bak/*
+assignments/chatbot/checkpoints/*
+assignments/chatbot/checkpoints.bak/*
